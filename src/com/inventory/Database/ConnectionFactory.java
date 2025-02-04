@@ -9,10 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Properties;
 
 /**
@@ -34,25 +31,31 @@ public class ConnectionFactory {
     Statement statement = null;
     ResultSet resultSet = null;
 
-    public ConnectionFactory(){
+    public ConnectionFactory() {
         try {
-            //Username and Password saved as configurable properties to allow changes without recompilation.
+            // Load credentials from XML
             prop = new Properties();
             prop.loadFromXML(new FileInputStream("lib/DBCredentials.xml"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        username = prop.getProperty("username");
-        password = prop.getProperty("password");
 
-        try {
+            username = prop.getProperty("username");
+            password = prop.getProperty("password");
+
+            // Load the PostgreSQL driver
             Class.forName(driver);
+
+            // Establish connection
             conn = DriverManager.getConnection(url, username, password);
-            statement = conn.createStatement();
+            statement = conn.createStatement();  // Initialize statement here
+
+        } catch (IOException e) {
+            System.err.println("Error loading database credentials.");
+            e.printStackTrace();
         } catch (Exception e) {
+            System.err.println("Database connection failed.");
             e.printStackTrace();
         }
     }
+
 
     public Connection getConn() {
         try {
@@ -66,21 +69,18 @@ public class ConnectionFactory {
     }
 
     //Login verification method
-    public boolean checkLogin(String username, String password, String userType){
-        String query = "SELECT * FROM users WHERE username='"
-                + username
-                + "' AND password='"
-                + password
-                + "' AND usertype='"
-                + userType
-                + "' FETCH FIRST 1 ROW ONLY";
-
-        try {
-            resultSet = statement.executeQuery(query);
-            if(resultSet.next()) return true;
+    public boolean checkLogin(String username, String password, String userType) {
+        String query = "SELECT 1 FROM users WHERE username=? AND password=? AND usertype=? FETCH FIRST 1 ROW ONLY";
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            pstmt.setString(3, userType);
+            resultSet = pstmt.executeQuery();
+            return resultSet.next();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
         return false;
     }
+
 }
