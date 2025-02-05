@@ -185,7 +185,7 @@ public class ProductDAO {
     }
     public void addFunction(ProductDTO productDTO) {
         try {
-            String query = "INSERT INTO products VALUES(null,?,?,?,?,?)";
+            String query = "INSERT INTO products (productcode, productname, costprice, sellprice, brand) VALUES (?,?,?,?,?)";
             prepStatement = (PreparedStatement) conn.prepareStatement(query);
             prepStatement.setString(1, productDTO.getProdCode());
             prepStatement.setString(2, productDTO.getProdName());
