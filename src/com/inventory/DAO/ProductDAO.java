@@ -603,9 +603,21 @@ public class ProductDAO {
         return new DefaultTableModel(data, columnNames);
     }
 
-
-
-
-
-
+    public ResultSet getLowStockProducts(int threshold) {
+        try {
+            String query = """
+            SELECT products.productname, currentstock.quantity, products.brand,
+            (SELECT fullname FROM suppliers WHERE suppliers.suppliercode = products.productcode) AS supplier
+            FROM currentstock
+            JOIN products ON currentstock.productcode = products.productcode
+            WHERE currentstock.quantity < ?
+        """;
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setInt(1, threshold);
+            return ps.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

@@ -8,6 +8,7 @@ package com.inventory.UI;
 import com.inventory.DAO.UserDAO;
 import com.inventory.DTO.UserDTO;
 import com.inventory.Database.ConnectionFactory;
+import com.inventory.server.LocalHttpServer;
 
 import javax.swing.*;
 import java.awt.CardLayout;
@@ -48,6 +49,7 @@ public class Dashboard extends javax.swing.JFrame {
         // Panel Layout set to Card Layout to allow switching between different sections
         displayPanel.setLayout(layout);
         displayPanel.add("Home", new HomePage(username));
+        displayPanel.add("Low Stock", new LowStockPage());
         displayPanel.add("Users", new UsersPage());
         displayPanel.add("Customers", new CustomerPage());
         displayPanel.add("Products", new ProductPage(username, this));
@@ -70,6 +72,7 @@ public class Dashboard extends javax.swing.JFrame {
 
         setTitle("Inventory Manager");
         setVisible(true);
+        LocalHttpServer.startServer();
     }
 
     // Methods to display different sections in the mainframe
@@ -100,6 +103,15 @@ public class Dashboard extends javax.swing.JFrame {
     public void addLogsPage() {
         layout.show(displayPanel, "Logs");
     }
+    public void addQRPage() {
+        QRCodePage qrPage = new QRCodePage();
+        displayPanel.add("QR Page", qrPage);
+        layout.show(displayPanel, "QR Page");
+    }
+    public void addLowStockPage() {
+        layout.show(displayPanel, "Low Stock");
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -117,6 +129,22 @@ public class Dashboard extends javax.swing.JFrame {
         homeButton = new javax.swing.JButton();
         prodButton = new javax.swing.JButton();
         stockButton = new javax.swing.JButton();
+        lowStockButton = new javax.swing.JButton("Low Stock");
+        lowStockButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lowStockButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addLowStockPage();
+            }
+        });
+        qrButton = new javax.swing.JButton();
+        qrButton.setText("QR Покупка");
+        qrButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        qrButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addQRPage();
+            }
+        });
+
         custButton = new javax.swing.JButton();
         suppButton = new javax.swing.JButton();
         salesButton = new javax.swing.JButton();
@@ -244,13 +272,15 @@ public class Dashboard extends javax.swing.JFrame {
                     .addComponent(homeButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(prodButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(stockButton, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
+                    .addComponent(lowStockButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(custButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(suppButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(salesButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(usersButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(purchaseButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(logsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                    .addComponent(qrButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap())
         );
         navPanelLayout.setVerticalGroup(
             navPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -261,6 +291,8 @@ public class Dashboard extends javax.swing.JFrame {
                 .addComponent(prodButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(stockButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(lowStockButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(custButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -274,6 +306,8 @@ public class Dashboard extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(logsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(24, Short.MAX_VALUE))
+                .addComponent(qrButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
         );
 
         displayPanel.setLayout(new java.awt.CardLayout());
@@ -454,5 +488,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JButton suppButton;
     private javax.swing.JPanel userPanel;
     private javax.swing.JButton usersButton;
+    private javax.swing.JButton lowStockButton;
+    private javax.swing.JButton qrButton;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,25 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.inventory.UI;
 
 import com.inventory.DAO.ProductDAO;
 
 import java.sql.SQLException;
 
-/**
- *
- * @author asjad
- */
 public class CurrentStockPage extends javax.swing.JPanel {
 
-
     String username;
-    /**
-     * Creates new form CurrentStockPage
-     */
     
     public CurrentStockPage(String username) {
         initComponents();
