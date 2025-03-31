@@ -5,15 +5,17 @@
  */
 package com.inventory.UI;
 
+import com.inventory.DAO.ProductDAO;
 import com.inventory.DAO.UserDAO;
 import com.inventory.DTO.UserDTO;
 import com.inventory.Database.ConnectionFactory;
 import com.inventory.server.LocalHttpServer;
 
 import javax.swing.*;
-import java.awt.CardLayout;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.ResultSet;
 import java.time.LocalDateTime;
 
 /**
@@ -49,7 +51,7 @@ public class Dashboard extends javax.swing.JFrame {
         // Panel Layout set to Card Layout to allow switching between different sections
         displayPanel.setLayout(layout);
         displayPanel.add("Home", new HomePage(username));
-        displayPanel.add("Low Stock", new LowStockPage());
+//        displayPanel.add("Low Stock", new LowStockPage());
         displayPanel.add("Users", new UsersPage());
         displayPanel.add("Customers", new CustomerPage());
         displayPanel.add("Products", new ProductPage(username, this));
@@ -72,6 +74,37 @@ public class Dashboard extends javax.swing.JFrame {
 
         setTitle("Inventory Manager");
         setVisible(true);
+        try {
+            ProductDAO productDAO = new ProductDAO();
+            ResultSet rs = productDAO.getLowStockProducts(5); //— порог
+            boolean hasLowStock = false;
+            StringBuilder message = new StringBuilder();
+
+            while (rs != null && rs.next()) {
+                hasLowStock = true;
+                message.append("• ")
+                        .append(rs.getString("productname"))
+                        .append(" — осталось: ")
+                        .append(rs.getInt("quantity"))
+                        .append("\n");
+            }
+
+            if (hasLowStock) {
+                displayPanel.add("Low Stock", new LowStockPage());
+                lowStockButton.setVisible(true); // просто показываем
+                JOptionPane.showMessageDialog(
+                        this,
+                        "🔔 Низкий остаток:\n\n" + message,
+                        "Внимание",
+                        JOptionPane.WARNING_MESSAGE
+                );
+            } else {
+                lowStockButton.setVisible(false); // скрываем, если нет данных
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         LocalHttpServer.startServer();
     }
 
@@ -108,8 +141,20 @@ public class Dashboard extends javax.swing.JFrame {
         displayPanel.add("QR Page", qrPage);
         layout.show(displayPanel, "QR Page");
     }
+    public void addFAQPage() {
+        displayPanel.add("FAQ Page", new FAQPage());
+        layout.show(displayPanel, "FAQ Page");
+    }
+
     public void addLowStockPage() {
-        layout.show(displayPanel, "Low Stock");
+        Component[] components = displayPanel.getComponents();
+        for (Component c : components) {
+            if (c instanceof LowStockPage) {
+                layout.show(displayPanel, "Low Stock");
+                return;
+            }
+        }
+        JOptionPane.showMessageDialog(this, "Нет товаров с низким остатком.");
     }
 
 
@@ -144,6 +189,16 @@ public class Dashboard extends javax.swing.JFrame {
                 addQRPage();
             }
         });
+
+        faqButton = new javax.swing.JButton();
+        faqButton.setText("FAQ");
+        faqButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        faqButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addFAQPage();
+            }
+        });
+
 
         custButton = new javax.swing.JButton();
         suppButton = new javax.swing.JButton();
@@ -280,6 +335,7 @@ public class Dashboard extends javax.swing.JFrame {
                     .addComponent(purchaseButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(logsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(qrButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(faqButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addContainerGap())
         );
         navPanelLayout.setVerticalGroup(
@@ -307,6 +363,8 @@ public class Dashboard extends javax.swing.JFrame {
                 .addComponent(logsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(24, Short.MAX_VALUE))
                 .addComponent(qrButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(faqButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
         );
 
@@ -391,6 +449,7 @@ public class Dashboard extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
+        lowStockButton.setVisible(false); // Скрыть кнопку по умолчанию
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -490,5 +549,6 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JButton usersButton;
     private javax.swing.JButton lowStockButton;
     private javax.swing.JButton qrButton;
+    private javax.swing.JButton faqButton;
     // End of variables declaration//GEN-END:variables
 }

@@ -175,5 +175,11 @@ VALUES
     (20, 'Trial Admin', 'Local', '9876543210', 'root', 'root', 'ADMINISTRATOR'),
     (29, 'Trial Employee', 'Local', '1122334455', 'emp1', 'emp1', 'EMPLOYEE');
 
+CREATE TABLE faq (
+                     id SERIAL PRIMARY KEY,
+                     question TEXT NOT NULL,
+                     answer TEXT NOT NULL
+);
+
 -- Завершение транзакции
 COMMIT;
